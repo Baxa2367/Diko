@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Project Bloom — 8 Наурыз</title>
+  <style>
+    :root{
+      --bg1:#0f1020;
+      --bg2:#1a1d3a;
+      --stroke:rgba(255,255,255,.18);
+      --text:#f8f8ff;
+      --muted:#c8c9dd;
+      --accent:#ff6fae;
+      --accent2:#ffd166;
+      --shadow:0 20px 60px rgba(0,0,0,.35);
+    }
+
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      min-height:100%;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, #2a1d4e 0%, transparent 60%),
+        radial-gradient(1000px 600px at 90% 20%, #3f1d37 0%, transparent 60%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+      overflow-y:auto;
+      -webkit-text-size-adjust:100%;
+      scroll-behavior:smooth;
+    }
+
+    .particles{
+      position:fixed; inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      z-index:0;
+    }
+    .particle{
+      position:absolute;
+      opacity:.18;
+      animation: floatUp linear infinite;
+      user-select:none;
+      filter: drop-shadow(0 0 8px rgba(255,255,255,.08));
+    }
+    @keyframes floatUp{
+      from{transform:translateY(110vh) translateX(0) rotate(0deg); opacity:0}
+      10%{opacity:.18}
+      to{transform:translateY(-20vh) translateX(30px) rotate(180deg); opacity:0}
+    }
+
+    .app{
+      position:relative;
+      z-index:1;
+      min-height:100vh;
+      min-height:100dvh;
+      display:grid;
+      place-items:center;
+      padding:20px;
+      padding-left:max(20px, env(safe-area-inset-left));
+      padding-right:max(20px, env(safe-area-inset-right));
+      padding-top:max(20px, env(safe-area-inset-top));
+      padding-bottom:max(20px, env(safe-area-inset-bottom));
+    }
+
+    .screen{
+      width:min(860px, 100%);
+      min-height:520px;
+      border:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius:24px;
+      box-shadow: var(--shadow);
+      padding:24px;
+      padding-bottom:72px;
+      display:none;
+      position:relative;
+      margin-block:10px;
+    }
+    .screen.active{display:block; animation:fadeIn .5s ease;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+    .header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:700; letter-spacing:.3px;
+      user-select:none;
+    }
+    .brand-badge{
+      width:12px;height:12px;border-radius:999px;
+      background:linear-gradient(135deg, var(--accent), #ff8ec1);
+      box-shadow:0 0 18px rgba(255,111,174,.7);
+      flex:0 0 auto;
+    }
+    .chip{
+      border:1px solid var(--stroke);
+      padding:8px 12px;
+      border-radius:999px;
+      color:var(--muted);
+      font-size:12px;
+      background:rgba(255,255,255,.03);
+      white-space:nowrap;
+    }
+
+    .hero{margin-top:10px; display:grid; gap:14px;}
+    .title{
+      font-size: clamp(26px, 4vw, 42px);
+      line-height:1.05;
+      margin:0;
+      font-weight:800;
+      letter-spacing:-.5px;
+    }
+    .subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.6;
+      max-width:62ch;
+    }
+
+    .panel{
+      margin-top:18px;
+      border:1px solid var(--stroke);
+      border-radius:18px;
+      background:rgba(255,255,255,.03);
+      padding:16px;
+    }
+
+    .btns{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px;}
+    button{
+      border:none;
+      border-radius:14px;
+      padding:12px 16px;
+      font-weight:700;
+      color:#0b0b12;
+      background:linear-gradient(135deg, var(--accent2), #ffb703);
+      cursor:pointer;
+      transition:.2s ease;
+      box-shadow:0 8px 24px rgba(255,183,3,.25);
+      font:inherit;
+    }
+    button:hover{transform:translateY(-2px) scale(1.01)}
+    button:active{transform:translateY(0) scale(.995)}
+    button:disabled{opacity:.65;cursor:not-allowed;transform:none!important}
+
+    .btn-secondary{
+      color:var(--text);
+      background:rgba(255,255,255,.06);
+      border:1px solid var(--stroke);
+      box-shadow:none;
+    }
+
+    .progress-wrap{margin-top:18px; display:grid; gap:10px;}
+    .progress-label{color:var(--muted); font-size:14px;}
+    .progress{
+      width:100%;
+      height:14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid var(--stroke);
+      overflow:hidden;
+    }
+    .progress-bar{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg, #ff8ec1, #ffd166, #70e000);
+      box-shadow:0 0 22px rgba(255,209,102,.35);
+      transition:width .15s linear;
+    }
+
+    .status-grid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:10px;
+    }
+    .status-item{
+      border:1px solid var(--stroke);
+      border-radius:14px;
+      padding:12px;
+      background:rgba(255,255,255,.03);
+    }
+    .status-k{font-size:12px;color:var(--muted)}
+    .status-v{font-weight:700;margin-top:4px}
+
+    .terminal{
+      margin-top:16px;
+      border:1px solid rgba(112,224,0,.25);
+      background:rgba(0,0,0,.35);
+      border-radius:16px;
+      padding:14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color:#c5ff9f;
+      min-height:180px;
+      position:relative;
+      overflow:hidden;
+    }
+    .terminal::before{
+      content:"";
+      position:absolute; inset:0;
+      background:linear-gradient(transparent 50%, rgba(255,255,255,.02) 50%);
+      background-size:100% 4px;
+      pointer-events:none;
+    }
+    .term-line{white-space:pre-wrap; line-height:1.55; margin:0;}
+    .cursor{
+      display:inline-block; width:8px; height:18px;
+      background:#c5ff9f; vertical-align:middle; margin-left:2px;
+      animation: blink 1s steps(1,end) infinite;
+    }
+    @keyframes blink{50%{opacity:0}}
+
+    .question-box{
+      margin-top:16px;
+      border:1px solid var(--stroke);
+      border-radius:16px;
+      padding:16px;
+      background:rgba(255,255,255,.03);
+    }
+    .q-title{margin:0 0 12px; font-size:20px; font-weight:700;}
+    .options{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px;}
+    .option{
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      padding:12px;
+      border-radius:14px;
+      cursor:pointer;
+      text-align:left;
+      transition:.2s ease;
+      font-weight:600;
+      box-shadow:none;
+    }
+    .option:hover{
+      transform:translateY(-2px);
+      border-color:rgba(255,255,255,.32);
+      background:rgba(255,255,255,.07);
+    }
+    .score{margin-top:14px; color:var(--muted); font-size:14px;}
+
+    .final-wrap{display:grid; gap:16px; margin-top:16px;}
+    .love-card{
+      border:1px solid var(--stroke);
+      border-radius:20px;
+      padding:18px;
+      background:
+        radial-gradient(500px 220px at 100% 0%, rgba(255,111,174,.12), transparent 60%),
+        radial-gradient(400px 220px at 0% 100%, rgba(255,209,102,.10), transparent 60%),
+        rgba(255,255,255,.03);
+    }
+    .greet{font-size: clamp(22px,3vw,32px); margin:0 0 8px; font-weight:800;}
+    .letter{
+      margin:0;
+      color:#f0eefb;
+      line-height:1.75;
+      font-size:15px;
+      white-space:pre-line;
+    }
+    .gift-box{
+      border:1px dashed rgba(255,209,102,.45);
+      border-radius:16px;
+      padding:14px;
+      color:var(--muted);
+      background:rgba(255,209,102,.04);
+      display:none;
+      animation: fadeIn .4s ease;
+    }
+    .gift-box.show{display:block}
+    .gift-box strong{color:#fff}
+
+    .footer-note{
+      position:absolute;
+      bottom:16px;
+      left:24px;
+      right:24px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      color:rgba(255,255,255,.55);
+      font-size:12px;
+      border-top:1px solid rgba(255,255,255,.08);
+      padding-top:12px;
+    }
+
+    .hidden-msg{
+      position:absolute;
+      top:68px;
+      right:24px;
+      border:1px solid rgba(255,111,174,.35);
+      background:rgba(255,111,174,.09);
+      color:#ffd9ea;
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:13px;
+      opacity:0;
+      transform:translateY(-4px);
+      pointer-events:none;
+      transition:.25s ease;
+      z-index:2;
+    }
+    .hidden-msg.show{opacity:1; transform:translateY(0);}
+
+    @media (max-width: 640px){
+      .app{
+        padding:12px;
+        padding-left:max(12px, env(safe-area-inset-left));
+        padding-right:max(12px, env(safe-area-inset-right));
+        padding-top:max(12px, env(safe-area-inset-top));
+        padding-bottom:max(12px, env(safe-area-inset-bottom));
+        align-items:start;
+      }
+      .screen{
+        min-height:auto;
+        padding:16px;
+        padding-bottom:18px;
+        border-radius:18px;
+        margin-block:8px 16px;
+      }
+      .header{align-items:flex-start; gap:8px; flex-direction:column;}
+      .chip{font-size:11px; padding:6px 10px;}
+      .title{font-size: clamp(22px, 7vw, 30px); line-height:1.12;}
+      .subtitle{font-size:14px; line-height:1.5;}
+      .panel,.question-box,.love-card{padding:14px; border-radius:14px;}
+      .terminal{min-height:150px; padding:12px; font-size:12px;}
+      .status-grid{grid-template-columns:1fr;}
+      .options{grid-template-columns:1fr; gap:8px;}
+      .option{min-height:48px; font-size:14px; padding:12px;}
+      .btns{flex-direction:column; gap:8px;}
+      button{width:100%; min-height:48px; border-radius:12px; font-size:14px; padding:12px 14px;}
+      .footer-note{
+        position:static;
+        margin-top:14px;
+        padding-top:10px;
+        font-size:11px;
+        flex-direction:column;
+        gap:4px;
+      }
+      .hidden-msg{top:56px; right:12px; left:12px; font-size:12px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+
+  <div class="app">
+    <!-- LOADING -->
+    <section class="screen active" id="screen-loading">
+      <div class="header">
+        <div class="brand" id="brandTap">
+          <span class="brand-badge"></span>
+          <span>Project Bloom</span>
+        </div>
+        <div class="chip">build: 0803 • private release</div>
+      </div>
+
+      <div class="hidden-msg" id="hiddenMsg">Пасхалка 😌 Сен таптың.</div>
+
+      <div class="hero">
+        <h1 class="title">Сюрприз іске қосылуда…</h1>
+        <p class="subtitle">
+          Бұл — жай құттықтау емес. Бұл — өз қолыммен жасалған кішкентай жоба: аздап код, аздап сиқыр, көп көңіл.
+        </p>
+      </div>
+
+      <div class="panel">
+        <div class="progress-wrap">
+          <div class="progress-label" id="progressLabel">Модульдер жүктелуде…</div>
+          <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+        </div>
+
+        <div class="status-grid">
+          <div class="status-item"><div class="status-k">UI Engine</div><div class="status-v" id="s1">күтілуде…</div></div>
+          <div class="status-item"><div class="status-k">Heart Renderer</div><div class="status-v" id="s2">күтілуде…</div></div>
+          <div class="status-item"><div class="status-k">Warm Words API</div><div class="status-v" id="s3">күтілуде…</div></div>
+        </div>
+
+        <div class="terminal">
+          <p class="term-line" id="termText"></p>
+        </div>
+
+        <div class="btns">
+          <button id="startBtn" disabled>Сюрпризді ашу 💖</button>
+          <button class="btn-secondary" id="skipLoadBtn">Жүктеуді өткізу</button>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        <span>made with care by Bakbergen</span>
+        <span>менің сүйіктім үшін 💐</span>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section class="screen" id="screen-quiz">
+      <div class="header">
+        <div class="brand">
+          <span class="brand-badge"></span>
+          <span>Secret Interaction Module</span>
+        </div>
+        <div class="chip" id="quizStepChip">Қадам 1 / 3</div>
+      </div>
+
+      <div class="hero">
+        <h1 class="title">Кішігірім квест 💻🌷</h1>
+        <p class="subtitle">
+          Мұнда қате жауап жоқ. Бұл — соңындағы ең маңызды сөздерге апаратын жол ғана.
+        </p>
+      </div>
+
+      <div class="question-box">
+        <h2 class="q-title" id="questionTitle">Сұрақ жүктелуде…</h2>
+        <div class="options" id="options"></div>
+        <div class="score" id="scoreText">Жылу жиналуда: 0/3 ✨</div>
+      </div>
+
+      <div class="btns">
+        <button class="btn-secondary" id="backToLoadBtn">← Артқа</button>
+      </div>
+
+      <div class="footer-note">
+        <span>interaction mode</span>
+        <span id="progressHuman">дайын: 33%</span>
+      </div>
+    </section>
+
+    <!-- FINAL -->
+    <section class="screen" id="screen-final">
+      <div class="header">
+        <div class="brand">
+          <span class="brand-badge"></span>
+          <span>Final Output</span>
+        </div>
+        <div class="chip">status: success ✅</div>
+      </div>
+
+      <div class="hero">
+        <h1 class="title" id="finalTitle">8 наурызбен, жаным 🌸</h1>
+        <p class="subtitle" id="finalSubtitle">
+          Мен мұны саған арнап өзім жасадым. Енді — ең маңыздысы.
+        </p>
+      </div>
+
+      <div class="final-wrap">
+        <div class="love-card">
+          <h2 class="greet" id="finalName">Сүйіктім 💖</h2>
+          <p class="letter" id="letterText"></p>
+        </div>
+
+        <div class="btns">
+          <button id="giftBtn">Жасырын сыйлықты ашу 🎁</button>
+          <button class="btn-secondary" id="restartBtn">Қайта өту ↻</button>
+        </div>
+
+        <div class="gift-box" id="giftBox">
+          <strong>Сыйлық іске қосылды:</strong><br/>
+          <span id="giftCustomText"></span>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        <span>build completed successfully</span>
+        <span id="finalMeta">handcrafted • 2026</span>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /* =========================
+       ✅ ОСЫ ЖЕРДІ ӨЗГЕРТ
+    ========================== */
+    const CONFIG = {
+      // 1) Қыздың аты:
+      recipientName: "Дикошааа", // ← осында өзгерте сал
+
+      // 2) Финал тақырып/сипаттама:
+      finalTitle: "8 наурызыңмен 🌸",
+      finalSubtitle: "Бұл — жай құттықтау емес. Бұл — саған арналған менің кішкентай жобам.",
+
+      // 3) Сенің атыңнан жазылған мәтін:
+      letter: `8 наурыз мерекеңмен, Дикоша 💖
+
+Саған арнап әдеттегі құттықтаудан бөлек, кішкентай әрі ерекше бір нәрсе жасағым келді. Сондықтан осы мини-сайтты өз қолыммен дайындадым.
+
+Саған көп қуаныш, шабыт, жылы эмоциялар, әдемі күндер және жағымды тосынсыйлар тілеймін.
+Жаныңда әрдайым жақсы адамдар болып, көңілің тыныш болсын.
+
+Сенің энергияң мен позитивің үшін рақмет ✨
+Бүгінгі күнің ерекше әдемі өтсін.`,
+      // 4) “Жасырын сыйлық” ішінде шығатын мәтін:
+      giftText: "Сыйлық: гүл 💐 + кофе/шай ☕ + серуен 🌆 + бір кеш тек екеумізге ✨"
+    };
+
+    /* =========================
+       UI
+    ========================== */
+    const screens = {
+      loading: document.getElementById("screen-loading"),
+      quiz: document.getElementById("screen-quiz"),
+      final: document.getElementById("screen-final"),
+    };
+
+    function showScreen(name){
+      Object.values(screens).forEach(s => s && s.classList.remove("active"));
+      screens[name]?.classList.add("active");
+      requestAnimationFrame(() => window.scrollTo({top:0, behavior:"smooth"}));
+    }
+
+    /* =========================
+       Particles
+    ========================== */
+    const particlesEl = document.getElementById("particles");
+    const particleSymbols = ["🌸","✨","💮","💖","🌷"];
+    function createParticle(){
+      const p = document.createElement("div");
+      p.className = "particle";
+      p.textContent = particleSymbols[Math.floor(Math.random()*particleSymbols.length)];
+      p.style.left = Math.random()*100 + "vw";
+      p.style.animationDuration = (12 + Math.random()*18) + "s";
+      p.style.animationDelay = (Math.random()*4) + "s";
+      p.style.fontSize = (12 + Math.random()*14) + "px";
+      particlesEl.appendChild(p);
+      setTimeout(() => p.remove(), 32000);
+    }
+    setInterval(createParticle, 450);
+    for(let i=0;i<12;i++) setTimeout(createParticle, i*150);
+
+    /* =========================
+       Loading
+    ========================== */
+    const progressBar = document.getElementById("progressBar");
+    const progressLabel = document.getElementById("progressLabel");
+    const startBtn = document.getElementById("startBtn");
+    const skipLoadBtn = document.getElementById("skipLoadBtn");
+    const termText = document.getElementById("termText");
+    const s1 = document.getElementById("s1");
+    const s2 = document.getElementById("s2");
+    const s3 = document.getElementById("s3");
+
+    const loadingMessages = [
+      "Интерфейс модульдері қосылуда…",
+      "Жылы сөздер компиляциялануда…",
+      "Күлкі деңгейі тексерілуде…",
+      "Мерекелік атмосфера орнатылуда…",
+      "Соңғы сюрприз жиналуда…",
+      "Дайын. Ашуға болады ✨"
+    ];
+
+    const terminalLines = [
+      "> boot project_bloom",
+      "> loading ui_engine...",
+      "> loading heart_renderer...",
+      "> loading warm_words_api...",
+      "> validating happiness_level...",
+      "> result: MAXIMUM",
+      "> no critical errors found",
+      "> surprise.exe ready"
+    ];
+
+    let loadingDone = false;
+    let loadPercent = 0;
+    let loadTimer = null;
+
+    function updateStatuses(p){
+      s1.textContent = p >= 35 ? "online ✅" : "жүктелуде…";
+      s2.textContent = p >= 68 ? "ready ✅" : "күтілуде…";
+      s3.textContent = p >= 92 ? "connected ✅" : "байланыс…";
+    }
+
+    function typeTerminal(lines, speed=26){
+      let full = "";
+      let lineIndex = 0;
+
+      function typeNext(){
+        if(lineIndex >= lines.length){
+          termText.innerHTML = full + '<span class="cursor"></span>';
+          return;
+        }
+        const line = lines[lineIndex] + "\n";
+        let charIdx = 0;
+        const charTimer = setInterval(() => {
+          full += line[charIdx] || "";
+          termText.innerHTML = full.replace(/\n/g,"<br>") + '<span class="cursor"></span>';
+          charIdx++;
+          if(charIdx >= line.length){
+            clearInterval(charTimer);
+            lineIndex++;
+            setTimeout(typeNext, 180);
+          }
+        }, speed);
+      }
+      typeNext();
+    }
+
+    function runLoading(){
+      if(loadTimer) clearInterval(loadTimer);
+      typeTerminal(terminalLines);
+
+      loadTimer = setInterval(() => {
+        loadPercent += Math.floor(Math.random()*6) + 2;
+        if(loadPercent > 100) loadPercent = 100;
+
+        progressBar.style.width = loadPercent + "%";
+        updateStatuses(loadPercent);
+
+        const msgIndex = Math.min(
+          Math.floor((loadPercent / 100) * (loadingMessages.length - 1)),
+          loadingMessages.length - 1
+        );
+        progressLabel.textContent = loadingMessages[msgIndex];
+
+        if(loadPercent >= 100){
+          clearInterval(loadTimer);
+          loadingDone = true;
+          startBtn.disabled = false;
+          startBtn.textContent = "Сюрпризді ашу 💖";
+          progressLabel.textContent = "Дайын! (багсыз деуге болады 😄)";
+          s1.textContent = "online ✅";
+          s2.textContent = "ready ✅";
+          s3.textContent = "connected ✅";
+        }
+      }, 320);
+    }
+
+    skipLoadBtn.addEventListener("click", () => {
+      loadPercent = 100;
+      loadingDone = true;
+      if(loadTimer) clearInterval(loadTimer);
+
+      progressBar.style.width = "100%";
+      updateStatuses(100);
+      progressLabel.textContent = "Жүктеу өткізілді. Дайын ✅";
+
+      startBtn.disabled = false;
+      if (!termText.innerHTML.trim()) {
+        termText.innerHTML = terminalLines.join("<br>") + '<br><span class="cursor"></span>';
+      }
+    });
+
+    startBtn.addEventListener("click", () => {
+      if(!loadingDone) return;
+      showScreen("quiz");
+      renderQuestion();
+    });
+
+    document.getElementById("backToLoadBtn").addEventListener("click", () => {
+      showScreen("loading");
+    });
+
+    /* =========================
+       Easter egg
+    ========================== */
+    let taps = 0;
+    const brandTap = document.getElementById("brandTap");
+    const hiddenMsg = document.getElementById("hiddenMsg");
+    brandTap.addEventListener("click", () => {
+      taps++;
+      if(taps >= 5){
+        hiddenMsg.classList.add("show");
+        setTimeout(() => hiddenMsg.classList.remove("show"), 2000);
+        taps = 0;
+      }
+    });
+
+    /* =========================
+       Quiz
+    ========================== */
+    const questions = [
+      {
+        q: "Бүгінгі көңіл-күйің қандай? 🌷",
+        options: ["Жайлы әрі тыныш ☕", "Жарқын әрі мерекелік ✨", "Көңілді 😄", "Бәрінен аздап 💫"]
+      },
+      {
+        q: "Саған не көбірек ұнайды? 🎁",
+        options: ["Назар мен қамқорлық 💖", "Күтпеген тосынсый 😍", "Әдемі атмосфера 🌸", "Барлығы бірге 🙌"]
+      },
+      {
+        q: "Финал қандай болсын? 💐",
+        options: ["Жылы сөздер", "Мини-сыйлық", "Серуен/кофе", "Барлығы approved ✅"]
+      }
+    ];
+
+    let currentQuestion = 0;
+    let answers = [];
+
+    const questionTitle = document.getElementById("questionTitle");
+    const optionsEl = document.getElementById("options");
+    const scoreText = document.getElementById("scoreText");
+    const quizStepChip = document.getElementById("quizStepChip");
+    const progressHuman = document.getElementById("progressHuman");
+
+    function renderQuestion(){
+      const item = questions[currentQuestion];
+      quizStepChip.textContent = `Қадам ${currentQuestion + 1} / ${questions.length}`;
+      progressHuman.textContent = `дайын: ${Math.round(((currentQuestion+1)/questions.length)*100)}%`;
+
+      questionTitle.textContent = item.q;
+      optionsEl.innerHTML = "";
+
+      item.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "option";
+        btn.textContent = opt;
+        btn.type = "button";
+        btn.onclick = () => selectAnswer(opt);
+        optionsEl.appendChild(btn);
+      });
+
+      scoreText.textContent = `Жылу жиналуда: ${answers.filter(Boolean).length}/${questions.length} ✨`;
+    }
+
+    function selectAnswer(answer){
+      answers[currentQuestion] = answer;
+      scoreText.textContent = `Жылу жиналуда: ${answers.filter(Boolean).length}/${questions.length} ✨`;
+
+      setTimeout(() => {
+        currentQuestion++;
+        if(currentQuestion < questions.length){
+          renderQuestion();
+        } else {
+          prepareFinal();
+          showScreen("final");
+        }
+      }, 220);
+    }
+
+    /* =========================
+       Final
+    ========================== */
+    const finalTitle = document.getElementById("finalTitle");
+    const finalSubtitle = document.getElementById("finalSubtitle");
+    const finalName = document.getElementById("finalName");
+    const letterText = document.getElementById("letterText");
+    const giftCustomText = document.getElementById("giftCustomText");
+    const giftBtn = document.getElementById("giftBtn");
+    const giftBox = document.getElementById("giftBox");
+    const restartBtn = document.getElementById("restartBtn");
+
+    function typeText(element, text, speed=14){
+      element.textContent = "";
+      let i = 0;
+      const timer = setInterval(() => {
+        element.textContent += text[i] || "";
+        i++;
+        if(i >= text.length) clearInterval(timer);
+      }, speed);
+    }
+
+    function prepareFinal(){
+      finalTitle.textContent = CONFIG.finalTitle;
+      finalSubtitle.textContent = CONFIG.finalSubtitle;
+      finalName.textContent = `${CONFIG.recipientName} 💖`;
+      giftCustomText.textContent = CONFIG.giftText;
+
+      const moodHint = answers[0]
+        ? `\n\nP.S. Сен таңдаған көңіл-күй: ${answers[0].replace(/✅|✨|💫|☕|😄|😍|🌸|🙌|💖|💐|🌷/g,"").trim()} — саған керемет жарасады.`
+        : "";
+
+      typeText(letterText, CONFIG.letter + moodHint, 12);
+      giftBox.classList.remove("show");
+      document.getElementById("finalMeta").textContent = `handcrafted • ${new Date().getFullYear()}`;
+    }
+
+    giftBtn.addEventListener("click", () => {
+      giftBox.classList.add("show");
+      burstConfetti();
+    });
+
+    restartBtn.addEventListener("click", () => {
+      currentQuestion = 0;
+      answers = [];
+      giftBox.classList.remove("show");
+      showScreen("quiz");
+      renderQuestion();
+    });
+
+    function burstConfetti(){
+      const burstSymbols = ["💖","✨","🌸","🎉","💐"];
+      for(let i=0; i<24; i++){
+        const el = document.createElement("div");
+        el.textContent = burstSymbols[Math.floor(Math.random()*burstSymbols.length)];
+        el.style.position = "fixed";
+        el.style.left = "50%";
+        el.style.top = "55%";
+        el.style.fontSize = (16 + Math.random()*12) + "px";
+        el.style.zIndex = 99;
+        el.style.pointerEvents = "none";
+
+        const dx = (Math.random() - 0.5) * 380;
+        const dy = (Math.random() - 0.7) * 280;
+        const rot = (Math.random() * 360 - 180);
+
+        el.animate([
+          { transform: "translate(0,0) scale(1) rotate(0deg)", opacity: 1 },
+          { transform: `translate(${dx}px, ${dy}px) scale(.7) rotate(${rot}deg)`, opacity: 0 }
+        ], {
+          duration: 900 + Math.random()*600,
+          easing: "cubic-bezier(.2,.8,.2,1)"
+        });
+
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1600);
+      }
+    }
+
+    // Init
+    prepareFinal(); // алдын ала аты/тақырып орнатылсын
+    runLoading();
+  </script>
+</body>
+</html>
